@@ -101,8 +101,13 @@ class MergeText
 				TextType.APPRAISE -> {
 					val text = it.second.content
 					val color = mapColorCorrespondingToReviewer(text)
-					resultList.add(Article.Apprise(color, text))
+
+
+					val final = wrapperText(text)
+
+					resultList.add(Article.Apprise(color, final))
 				}
+
 				TextType.NOTE -> {
 					val note = it.second as Note
 					resultList.add(
@@ -135,12 +140,12 @@ class MergeText
 								saveTempText(resultList, stringBuffer)
 							}
 
-							val text = message.appraiseMap[index + 1]!!
-
+							val temp = message.appraiseMap[index + 1]!!
+							val final = wrapperText(temp)
 							resultList.add(
 								Article.Apprise(
-									color = mapColorCorrespondingToReviewer(text),
-									text
+									color = mapColorCorrespondingToReviewer(final),
+									final
 								)
 							)
 
@@ -164,6 +169,26 @@ class MergeText
 		return resultList
 	}
 
+	/**
+	 * Wrapper text
+	 *这里只处理一种：打上结尾句号
+	 * @param text
+	 * @return
+	 */
+	private fun wrapperText(text: String): String
+	{
+		if(text.isEmpty()) {
+			return ""
+		}
+
+		val lastIndex = text.length - 1
+
+		if(text[lastIndex] == '。') {
+			return text
+		}
+
+		return "$text。"
+	}
 
 
 	sealed class Article

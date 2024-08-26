@@ -60,8 +60,8 @@ object FootnoteCreator
 		notePrefix: String ="",
 		noteSuffix: String ="",
 		colorVal: String? = null,
-		fontFamily: String = "DeJaVuFZKJZ-Frms",
-		fontSize: String? = "32",
+		fontFamily: String = "DeJaVuFZJZ-Frms",
+		fontSize: String? = "28",
 		isBlod: Boolean = false,
 		isItalic: Boolean = false,
 		isStrike: Boolean = false,
@@ -70,7 +70,8 @@ object FootnoteCreator
 		underLineColor: String? = null,
 		isHightLight: Boolean = false,
 		hightLightValue: Int = 0,
-		stRunEnum: STVerticalAlignRun.Enum = STVerticalAlignRun.SUPERSCRIPT
+		stRunEnum: STVerticalAlignRun.Enum = STVerticalAlignRun.SUPERSCRIPT,
+		noteContentStRunEnum: STVerticalAlignRun.Enum? =null
 	)
 	{
 		var r1 = createRun()
@@ -93,6 +94,8 @@ object FootnoteCreator
 			underLineColor, isHightLight, hightLightValue, stRunEnum
 		)
 
+		// 默认上，文字处脚注和解释处是一样的，当是，这不方便。所以取消了解释处上标状态。
+
 		val footnotes = xdoc.createFootnotes()
 		var ctNote: CTFtnEdn? = null
 		var ctp: CTP? = null
@@ -106,20 +109,20 @@ object FootnoteCreator
 		r1 = p2.createRun()
 		setRunTextStyleInfo(
 			r1, notePrefix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-			underLineColor, isHightLight, hightLightValue, stRunEnum
+			underLineColor, isHightLight, hightLightValue, noteContentStRunEnum
 		)
 
 		r1 = p2.createRun()
 		setRunTextStyleInfo(
 			r1, null, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-			underLineColor, isHightLight, hightLightValue, stRunEnum
+			underLineColor, isHightLight, hightLightValue, noteContentStRunEnum
 		)
 		r1.ctr.addNewFootnoteRef()
 
 		r1 = p2.createRun()
 		setRunTextStyleInfo(
 			r1, noteSuffix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-			underLineColor, isHightLight, hightLightValue, stRunEnum
+			underLineColor, isHightLight, hightLightValue, noteContentStRunEnum
 		)
 
 		r1 = p2.createRun()
@@ -130,7 +133,7 @@ object FootnoteCreator
 		r1 = p2.createRun()
 		setRunTextStyleInfo(
 			r1, noteContent, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-			underLineColor, isHightLight, hightLightValue, stRunEnum
+			underLineColor, isHightLight, hightLightValue, noteContentStRunEnum
 		)
 		footnotes.addFootnote(ctNote)
 	}

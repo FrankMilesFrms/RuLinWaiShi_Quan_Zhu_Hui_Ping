@@ -30,20 +30,26 @@ import java.io.File
  */
 fun main()
 {
-	val html = HuiPingHtmlLexer(File("C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\hui_ping\\3.html"))
 
-	val res =html.getContent()
+	for(i in 58..58)
+	{
+		val html = HuiPingHtmlLexer(File("C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\hui_ping\\${i + 1}.html"))
 
-	val testPath = "C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\html\\chapter002.html"
-	val savePath = "C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\res.docx"
-	val htmlLexer = HtmlLexer(File(testPath))
+		val res = html.getContent()
 
-	htmlLexer.bodyLexer { textList->
-		val m = MergeText()
-		val list = m.merage(textList, res)
+		val testPath = "C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\html\\chapter0${completionIndex(i)}.html"
+		val htmlLexer = HtmlLexer(File(testPath))
 
-		DocxCreator(list, savePath)
+		val savePath = "C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\${htmlLexer.getTitle()}.docx"
 
+		htmlLexer.bodyLexer { textList->
+			val m = MergeText()
+			val list = m.merage(textList, res)
+
+			DocxCreator(list, savePath)
+
+		}
 	}
+
 }
 
