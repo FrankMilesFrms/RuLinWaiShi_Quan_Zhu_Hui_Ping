@@ -1,5 +1,6 @@
+import HuiPingColor.mapColorCorrespondingToReviewer
+import jdk.internal.org.jline.utils.Colors.s
 import name.fraser.neil.plaintext.diff_match_patch
-import java.awt.SystemColor.text
 import java.rmi.UnexpectedException
 import kotlin.math.min
 
@@ -38,7 +39,7 @@ class MergeText
 		noteText: ArrayList<Pair<TextType, Message>>,
 
 		remarkText: ArrayList<Pair<TextType, String>>
-	)
+	): List<Article>
 	{
 		initText(noteText)
 
@@ -62,20 +63,116 @@ class MergeText
 				} else
 				{
 					val text = nearestText.second
-
 					val position = searchBestMatch(text)
-
-//					if (appriseValue.second.contains("一句话即见元章自处")) {
-//						System.err.println("测试文本位置：$position")
-//						System.err.println("检索文本：$text")
-//						throw UnexpectedException("")
-//					}
-
-					insetNote(position, noteText, appriseValue.second)
+					insertNote(position, noteText, appriseValue.second)
 				}
 			}
 			index++
 		}
+
+		return lexerAndCreateStandStream(noteText)
+	}
+
+	/**
+	 * Lexer and create stand stream
+	 *因为列表中文本有动态引用评语，有注释节点混淆不清，所以这里同一整合成深度只有一的文本。
+	 * 此外，为了方便接下来生成docx文本，每段也要区分。
+	 * @param noteText
+	 */
+	private fun lexerAndCreateStandStream(noteText: java.util.ArrayList<Pair<TextType, Message>>): List<Article>
+	{
+		val resultList = arrayListOf<Article>()
+
+		fun saveTempText(
+			resultList: ArrayList<Article>, stringBuffer: StringBuilder
+		)
+		{
+			resultList.add(
+				Article.Text(stringBuffer.toString())
+			)
+
+			stringBuffer.clear()
+		}
+
+
+		noteText.forEach {
+			when(it.first)
+			{
+				TextType.APPRAISE -> {
+					val text = it.second.content
+					val color = mapColorCorrespondingToReviewer(text)
+					resultList.add(Article.Apprise(color, text))
+				}
+				TextType.NOTE -> {
+					val note = it.second as Note
+					resultList.add(
+						Article.Note(
+							note.title, note.content
+						)
+					)
+				}
+
+				TextType.TEXT -> {
+					val message = it.second
+					val text = message.content
+					val stringBuffer = StringBuilder()
+
+					var index = 0
+					while (index < text.length)
+					{
+						val char = text[index]
+
+						if(char == '\n')
+						{
+							// 评价不可能换行
+							// 不会会有连续的'\n'？这里不做判断。
+							saveTempText(resultList, stringBuffer)
+
+						} else if(message.appraiseMap.containsKey(index + 1)) // 向后插入
+						{
+
+							if(stringBuffer.isNotEmpty()) {
+								saveTempText(resultList, stringBuffer)
+							}
+
+							val text = message.appraiseMap[index + 1]!!
+
+							resultList.add(
+								Article.Apprise(
+									color = mapColorCorrespondingToReviewer(text),
+									text
+								)
+							)
+
+							message.appraiseMap.remove(index + 1)
+						} else {
+							stringBuffer.append(char)
+						}
+
+						index++
+					}
+
+					// 不要遗漏结尾
+					if(stringBuffer.isNotEmpty()) {
+						saveTempText(resultList, stringBuffer)
+					}
+				}
+			}
+		}
+
+
+		return resultList
+	}
+
+
+
+	sealed class Article
+	{
+		data class Text(val content: String) : Article()
+
+		data class Note(val noteName: String, val content: String) : Article()
+
+		data class Apprise(val color: String, val content: String) : Article()
 	}
 
 	private fun initText(noteText: java.util.ArrayList<Pair<TextType, Message>>)
@@ -134,29 +231,6 @@ class MergeText
 		return closestIndex - 1
 	}
 
-
-
-	/**
-	 * Find before first text position
-	 *为了解决开头有多个批注而制作。
-	 * @param noteText
-	 * @return
-	 */
-	private fun findBeforeFirstTextPosition(noteText: java.util.ArrayList<Pair<TextType, Message>>): Int
-	{
-		var index = 0
-		while (index < noteText.size)
-		{
-			val value = noteText[index]
-			if (value.first == TextType.TEXT)
-			{
-				return index
-			}
-			index++
-		}
-		return index
-	}
-
 	/**
 	 * Search best match
 	 * 尽可能匹配位置
@@ -186,7 +260,7 @@ class MergeText
 	}
 
 
-	private fun insetNote(
+	private fun insertNote(
 		position: Int,
 		noteText: java.util.ArrayList<Pair<TextType, Message>>,
 		apprise: String)
@@ -206,21 +280,13 @@ class MergeText
 		}
 
 
-
 		val text = noteText[index]
 
 		text.second.append(relativePosition, apprise)
 
-//		System.err.println("插入评价：")
-//		System.err.println("插入评价：")
-//		System.err.println(apprise)
-//		System.err.println("-----")
-//		System.err.println(apprise)
-//		System.err.println("-----")
-//		System.err.println("位置：$relativePosition")
 	}
 
-	fun noResult(nearestText: Pair<TextType, String>): Boolean
+	private fun noResult(nearestText: Pair<TextType, String>): Boolean
 	{
 		return nearestText.first == TextType.NOTE && nearestText.second.isEmpty()
 	}
@@ -249,8 +315,4 @@ class MergeText
 		return TextType.NOTE to ""
 	}
 
-	fun printCache()
-	{
-		println(textCache)
-	}
 }

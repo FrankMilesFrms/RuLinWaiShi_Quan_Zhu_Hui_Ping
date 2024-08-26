@@ -2,8 +2,9 @@
 <project version="4">
   <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/gradle.properties" charset="US-ASCII" />
-    <file url="file://$PROJECT_DIR$/src/main/java/POI_Create_Footnote_S3_Test.kt" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/src/main/java/POI_Create_Footnote_S3_Test.kt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/kotlin/FootnoteCreator.kt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/kotlin/FootnoteCreator.kt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/kotlin/MergeText.kt" charset="GBK" />
     <file url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml-lite/5.3.0/4a639ca45af85065713bde6c5acddbf1418c3f02/poi-ooxml-lite-5.3.0.jar!/org/openxmlformats/schemas/wordprocessingml/x2006/main/STUnderline.class" charset="UTF-16BE" />
     <file url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml/4.1.0/42d7913de1a6360058e8d14bb7769a33633a639b/poi-ooxml-4.1.0.jar!/org/apache/poi/xwpf/usermodel/XWPFDocument.class" charset="UTF-16LE" />
     <file url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml/5.0.0/92e7e4086184ae074c4f1c0da178afed9ab66d1c/poi-ooxml-5.0.0.jar!/org/apache/poi/ooxml/POIXMLDocumentPart.class" charset="GBK" />

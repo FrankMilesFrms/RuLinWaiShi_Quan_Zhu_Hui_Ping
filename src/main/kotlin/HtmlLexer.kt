@@ -38,7 +38,7 @@ class HtmlLexer(htmlPath: File)
 	}
 
 	fun bodyLexer(
-		lexer: (ArrayList<Pair<TextType, Message>>, HashMap<String, Note>) -> Unit
+		lexer: (ArrayList<Pair<TextType, Message>>) -> Unit
 	)
 	{
 		val body = htmlDocument.body()
@@ -64,7 +64,16 @@ class HtmlLexer(htmlPath: File)
 		}
 
 		val res = mergeTextList(textList)
-		lexer(res, notesMap)
+
+		res.forEach { pair ->
+			if(pair.first == TextType.NOTE) {
+				val note = pair.second as Note
+
+				note.content = notesMap[note.title]!!.content
+			}
+		}
+
+		lexer(res)
 	}
 
 	private fun mergeTextList(textList: java.util.ArrayList<Pair<TextType, Message>>): ArrayList<Pair<TextType, Message>>
@@ -289,7 +298,7 @@ class HtmlLexer(htmlPath: File)
 	open class Message(
 		open val content: String
 	) {
-		private val appraiseMap = hashMapOf<Int, String>()
+		val appraiseMap = hashMapOf<Int, String>()
 
 		override fun toString(): String
 		{
@@ -319,21 +328,18 @@ class HtmlLexer(htmlPath: File)
 		{
 			if(appraiseMap.containsKey(position).not())
 			{
-				appraiseMap[position] = "【$appraise】"
+				appraiseMap[position] = appraise
 			} else {
-				appraiseMap[position] += " $appraise"
+				appraiseMap[position] = appraiseMap[position]!! + appraise
 			}
 		}
 
-		fun getAppraise(): Map<Int, String> = appraiseMap
-
-		fun isEmptyAppraise(): Boolean = appraiseMap.isEmpty()
 	}
 	data class Note(
 		val id: String,
 		val href: String,
 		val title: String,
-		override val content: String
+		override var content: String
 	): Message(
 		content = content
 	) {

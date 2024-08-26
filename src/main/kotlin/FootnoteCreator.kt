@@ -15,65 +15,43 @@ import java.math.BigInteger
 import kotlin.math.abs
 
 /**
+ * 原文链接: http://53873039oycg.iteye.com/blog/2158635
+ * 不做代码整洁处理。
  *
+ * 注意，一段中必须从第二个脚注开始使setParagraphTextStyleInfo的isNew=true以防止
+ * 脚注全部置尾问题。
+ * 例子：
+ * ```kotlin
+ * fun testAddFootnotesToDocument(savePath: String?)
+ * {
+ * 		val xdoc = XWPFDocument()
+ *
+ * 		val p2 = xdoc.createParagraph()
+ *
+ * 		xdoc.createParagraph().apply {
+ * 			noteId = noteId.add(BigInteger.ONE)
+ * 			setParagraphTextStyleInfo(
+ * 				false, "新的测试"
+ * 			)
+ * 			addFootNote(xdoc, noteId, "新的脚注", colorVal = "FF0000")
+ *
+ * 			setParagraphTextStyleInfo(
+ * 				true, "新的测试"
+ * 			)
+ * 			noteId = noteId.add(BigInteger.ONE)
+ * 			addFootNote(xdoc, noteId, "新的脚注", colorVal = "FF0000")
+ * 		}
+ *
+ * 		saveDocument(xdoc, savePath)
+ * 	}
+ * ````
  * * Email : FrankMiles@qq.com
  * * Date  : 2024/08/26, 下午5:16
  * modify by Frms(Frank Miles)
  */
 
-class POI_Create_Footnote_S3_Test
+object FootnoteCreator
 {
-	@Throws(Exception::class)
-	fun testAddFootnotesToDocument(savePath: String?)
-	{
-		val xdoc = XWPFDocument()
-
-		val p2 = xdoc.createParagraph()
-
-		p2.setParagraphTextStyleInfo(false, "测试", "000000", )
-
-		var noteId = BigInteger.valueOf(1)
-
-		p2.addFootNote(
-			xdoc,
-			noteId,
-			"参见1.1.1"
-		)
-
-		p2.setParagraphTextStyleInfo(
-			true,
-			"Cha",
-			"000000",
-			)
-
-		noteId = noteId.add(BigInteger.ONE)
-
-		p2.addFootNote(
-			xdoc,
-			noteId,
-			"参见1.1.2",
-			"[", "]",
-			//"000000"
-		)
-
-		p2.setParagraphTextStyleInfo(
-			true,
-			"Ru Jiao Zu",
-			"000000"
-		)
-
-		noteId = noteId.add(BigInteger.ONE)
-
-		p2.addFootNote(
-			xdoc,
-			noteId,
-			"参见1.1.3",
-			"[", "]",
-			"000000"
-		)
-
-		saveDocument(xdoc, savePath)
-	}
 
 	fun XWPFParagraph.addFootNote(
 		xdoc: XWPFDocument,
@@ -96,13 +74,10 @@ class POI_Create_Footnote_S3_Test
 	)
 	{
 		var r1 = createRun()
-		if (notePrefix != null)
-		{
-			setRunTextStyleInfo(
-				r1, notePrefix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-				underLineColor, isHightLight, hightLightValue, stRunEnum
-			)
-		}
+		setRunTextStyleInfo(
+			r1, notePrefix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
+			underLineColor, isHightLight, hightLightValue, stRunEnum
+		)
 
 		setRunTextStyleInfo(
 			r1, null, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
@@ -112,14 +87,11 @@ class POI_Create_Footnote_S3_Test
 		val fr = r1.ctr.addNewFootnoteReference()
 		fr.id = noteId
 
-		if (noteSuffix != null)
-		{
-			r1 = createRun()
-			setRunTextStyleInfo(
-				r1, noteSuffix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-				underLineColor, isHightLight, hightLightValue, stRunEnum
-			)
-		}
+		r1 = createRun()
+		setRunTextStyleInfo(
+			r1, noteSuffix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
+			underLineColor, isHightLight, hightLightValue, stRunEnum
+		)
 
 		val footnotes = xdoc.createFootnotes()
 		var ctNote: CTFtnEdn? = null
@@ -131,14 +103,11 @@ class POI_Create_Footnote_S3_Test
 
 		ctp = ctNote.addNewP()
 		p2 = XWPFParagraph(ctp, xdoc)
-		if (notePrefix != null)
-		{
-			r1 = p2.createRun()
-			setRunTextStyleInfo(
-				r1, notePrefix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-				underLineColor, isHightLight, hightLightValue, stRunEnum
-			)
-		}
+		r1 = p2.createRun()
+		setRunTextStyleInfo(
+			r1, notePrefix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
+			underLineColor, isHightLight, hightLightValue, stRunEnum
+		)
 
 		r1 = p2.createRun()
 		setRunTextStyleInfo(
@@ -147,14 +116,11 @@ class POI_Create_Footnote_S3_Test
 		)
 		r1.ctr.addNewFootnoteRef()
 
-		if (noteSuffix != null)
-		{
-			r1 = p2.createRun()
-			setRunTextStyleInfo(
-				r1, noteSuffix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
-				underLineColor, isHightLight, hightLightValue, stRunEnum
-			)
-		}
+		r1 = p2.createRun()
+		setRunTextStyleInfo(
+			r1, noteSuffix, fontFamily, colorVal, fontSize, isBlod, isItalic, isStrike, isUnderLine, underLineStyle,
+			underLineColor, isHightLight, hightLightValue, stRunEnum
+		)
 
 		r1 = p2.createRun()
 		val ctText = r1.ctr.addNewT()
@@ -169,7 +135,7 @@ class POI_Create_Footnote_S3_Test
 		footnotes.addFootnote(ctNote)
 	}
 
-	fun setRunTextStyleInfo(
+	private fun setRunTextStyleInfo(
 		pRun: XWPFRun, content: String?, fontFamily: String?, colorVal: String?, fontSize: String?, isBlod: Boolean,
 		isItalic: Boolean, isStrike: Boolean, isUnderLine: Boolean, underLineStyle: Int, underLineColor: String?,
 		isHightLight: Boolean, hightLightValue: Int, stRunEnum: STVerticalAlignRun.Enum?
@@ -258,7 +224,7 @@ class POI_Create_Footnote_S3_Test
 	fun XWPFParagraph.setParagraphTextStyleInfo(
 		isNew: Boolean,
 		content: String?,
-		colorVal: String?,
+		colorVal: String ="000000",
 		fontFamily: String = "DeJaVuFZJZ-Frms",
 		fontSize: String = "32",
 		isBlood: Boolean = false,
@@ -272,8 +238,7 @@ class POI_Create_Footnote_S3_Test
 		stRunEnum: STVerticalAlignRun.Enum? = null
 	)
 	{
-		var pRun: XWPFRun? = null
-		pRun = if (isNew)
+		var pRun = if (isNew)
 		{
 			createRun()
 		} else
@@ -365,23 +330,11 @@ class POI_Create_Footnote_S3_Test
 	}
 
 	@Throws(Exception::class)
-	fun saveDocument(document: XWPFDocument, savePath: String?)
+	fun saveDocument(document: XWPFDocument, savePath: String)
 	{
 		val fos = FileOutputStream(savePath)
 		document.write(fos)
 		fos.close()
 	}
 
-	companion object
-	{
-		@Throws(Exception::class)
-		@JvmStatic
-		fun main(args: Array<String>)
-		{
-			val t = POI_Create_Footnote_S3_Test()
-			t.testAddFootnotesToDocument(
-				"C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\sys_" + System.currentTimeMillis() + ".docx"
-			)
-		}
-	}
 }

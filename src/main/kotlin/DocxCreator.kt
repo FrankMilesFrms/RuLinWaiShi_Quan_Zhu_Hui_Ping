@@ -1,5 +1,10 @@
+import FootnoteCreator.addFootNote
+import FootnoteCreator.saveDocument
+import FootnoteCreator.setParagraphTextStyleInfo
+import HuiPingColor.mapColorCorrespondingToReviewer
 import org.apache.poi.xwpf.usermodel.*
-import java.io.FileOutputStream
+import java.math.BigInteger
+
 /*
  * Copyright (C) 2023 - 2024 Frms, All Rights Reserved.
  * This file is part of RuLiWaiShiHtmlToDocx.
@@ -24,26 +29,62 @@ import java.io.FileOutputStream
  */
 
 
-fun createWordDocumentWithFootnote() {
-	val document = XWPFDocument()
+class DocxCreator(
+	textPair: List<MergeText.Article>,
+	savePath: String
+)
+{
+	init
+	{
+		val doc = XWPFDocument()
+		var paragraph = doc.createParagraph()
 
-	// 创建一个段落
-	val paragraph = document.createParagraph()
-	val run = paragraph.createRun()
-	run.setText("这是一段带有脚注的文本。")
+		var bigInteger = BigInteger.ONE
 
-	val footerRecord = document.headerFooterPolicy
+		var index = 0
 
-	val footnote = document.createFootnote()
+		while (index < textPair.size)
+		{
+			when(val article = textPair[index])
+			{
+				is MergeText.Article.Apprise -> {
+					paragraph.setParagraphTextStyleInfo(
+						isNew = true,
+						colorVal = article.color,
+						content = article.content
+					)
+				}
+				is MergeText.Article.Note    -> {
+					paragraph.addFootNote(
+						xdoc = doc,
+						bigInteger,
+						noteContent = article.content
+					)
 
-	footnote.createParagraph().createRun().setText("脚注实例")
+					bigInteger = bigInteger.increase()
+				}
+				is MergeText.Article.Text    -> {
+					if(index > 0)
+					{
+						val pre = textPair[index - 1]
+						if(pre is MergeText.Article.Text) {
+							paragraph = doc.createParagraph()
+						}
 
-	// 将文档保存到文件
-	val out = FileOutputStream("C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\example_with_footnote.docx")
-	document.write(out)
-	out.close()
-}
+					}
+					paragraph.setParagraphTextStyleInfo(
+						isNew = index > 0,
+						content = article.content
+					)
+				}
+			}
+			index++
+		}
+		saveDocument(doc, savePath)
+	}
 
-fun main() {
-	createWordDocumentWithFootnote()
+	private fun BigInteger.increase(): BigInteger
+	{
+		return add(BigInteger.ONE)
+	}
 }

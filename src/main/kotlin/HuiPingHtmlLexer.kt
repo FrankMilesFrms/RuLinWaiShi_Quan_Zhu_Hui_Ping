@@ -1,7 +1,10 @@
+import HuiPingColor.mapColorCorrespondingToReviewer
+import org.apache.poi.ss.usermodel.Color
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.select.Elements
+import java.awt.SystemColor.text
 import java.io.File
 import java.rmi.UnexpectedException
 
@@ -130,8 +133,10 @@ class HuiPingHtmlLexer(htmlPath: File)
 
 	private fun getTypeAndText(it: Node, node: List<Node>) =
 		if (it.nameIs("#text"))
-		{    // 正文
-			TextType.TEXT to it.toString().clearErroneousNewlines()
+		{
+			// 正文
+			val text = it.toString().clearErroneousNewlines()
+			TextType.TEXT to text
 		} else if (it.nameIs("font"))
 		{    //评注
 			TextType.APPRAISE to getContentAsElement(it)
@@ -157,3 +162,5 @@ private fun String.clearErroneousNewlines(): String
 	return first.replace(" 　　 ", "\n")
 		.replace("　　", "\n")
 }
+
+
