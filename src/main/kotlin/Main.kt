@@ -40,7 +40,7 @@ fun main()
 		val testPath = "C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\html\\chapter0${completionIndex(i)}.html"
 		val htmlLexer = HtmlLexer(File(testPath))
 
-		val savePath = "C:\\Users\\Frms\\Desktop\\RuLiWaiShi\\${htmlLexer.getTitle()}.docx"
+		val savePath = "E:\\Projects\\IdeaProjects\\RuLiWaiShiHtmlToDocx\\out\\${htmlLexer.getTitle()}.docx"
 
 		htmlLexer.bodyLexer { textList->
 			val m = MergeText()
